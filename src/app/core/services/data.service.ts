@@ -38,7 +38,7 @@ export class DataService {
     // * Deployment
     this.localBaseUrl = "http://localhost:3500/api/";
     this.prodUrl ="https://survayexpert.herokuapp.com/api/";
-    this.baseUrl = this.localBaseUrl;
+    this.baseUrl = this.prodUrl;
     
     
   }
