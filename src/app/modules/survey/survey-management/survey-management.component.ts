@@ -60,7 +60,7 @@ export class SurveyManagementComponent implements OnInit, AfterViewInit {
   }
 
   onShareLink(id: string | undefined, event: any): void {
-    const link = 'https://comp229-group-project-3c.herokuapp.com/surveys/take/' + id;
+    const link = "https://runtimer-ui-demo.herokuapp.com"
     // needs a text area to work. removed after copy
     const selBox = document.createElement('textarea');
     selBox.style.position = 'fixed';
