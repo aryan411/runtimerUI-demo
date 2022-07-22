@@ -11,27 +11,26 @@
 
     <div class="form-group">
       <label>Type</label>
-      <select class="form-control" name="optionType" [(ngModel)]="placeholderQuestion.optionType">
-        <option value="checkbox">Checkbox</option>
-        <option value="radio">Radio</option>
+      <select class="form-control" name="optionType" (change)="onSelectType()" [(ngModel)]="placeholderQuestion.optionType">
+        <option value="Multiple Choice">Multiple Choice</option>
+        <option value="True or False">True or False</option>
       </select>
     </div>
 
-    <!-- Looping to display options in form-->
-    <div *ngFor="let option of placeholderQuestion.options; let i = index;" class="form-group">
-      <label>Option Description</label>
-      <div class="d-flex flex-row">
-        <!--icon for deleting otptions-->
-        <i id="delete-option-button" class="fas fa-minus-circle p-1" (click)="onDelete(i)"
-          *ngIf="placeholderQuestion.options.length > 1"></i>
-        <!--Options input-->
-        <input class="form-control" placeholder="Enter option description" name="details + {{i}}"
-          [(ngModel)]="option.details">
+      <div *ngFor="let option of placeholderQuestion.options; let i = index;" class="form-group">
+        <label>Option {{i+1}}</label>
+        <div class="d-flex flex-row">
+          <!--icon for deleting otptions-->
+          <i id="delete-option-button" class="fas fa-minus-circle p-1" (click)="onDelete(i)"
+            *ngIf="placeholderQuestion.options.length > 1"></i>
+          <!--Options input-->
+          <input [disabled]="placeholderQuestion.optionType == 'True or False'" class="form-control" placeholder="Enter option description" name="details + {{i}}"
+            [(ngModel)]="option.details">
+        </div>
       </div>
-    </div>
-
+    <!-- Looping to display options in form-->
     <div class="row ml-0">
-      <button [disabled]="!placeholderQuestion.title" (click)="onAddOption()"
+      <button *ngIf="placeholderQuestion.optionType == 'Multiple Choice'" [disabled]="!placeholderQuestion.title" (click)="onAddOption()"
         class="btn btn-sm blue-btn m-1 btn-shadow large-btn">
         <i class="fas fa-plus-circle"></i> ADD OPTION
       </button>

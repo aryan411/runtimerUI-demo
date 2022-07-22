@@ -1,20 +1,26 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { FlashMessagesService } from 'angular2-flash-messages';
-import { OptionType } from 'src/app/core/models/option.model';
+import { Option, OptionType } from 'src/app/core/models/option.model';
 import Question from 'src/app/core/models/question.model';
 
 @Component({
   selector: 'app-question-form',
   templateUrl: './question-form.component.html',
-  styleUrls: ['./question-form.component.css']
+  styleUrls: ['./question-form.component.css'],
 })
 export class QuestionFormComponent implements OnInit, OnChanges {
-  @Input() question!: Question |  null;
+  @Input() question!: Question | null;
   @Output() save = new EventEmitter();
   public placeholderQuestion!: Question;
-  constructor(
-    private flashMessage: FlashMessagesService
-  ) { }
+  constructor(private flashMessage: FlashMessagesService) {}
 
   ngOnInit(): void {
     this.initializePlaceholderQuestion();
@@ -29,13 +35,12 @@ export class QuestionFormComponent implements OnInit, OnChanges {
 
   onAddOption(): void {
     this.placeholderQuestion.options.push({
-      details: ''
+      details: '',
     });
   }
 
   onDelete(index: number): void {
-    if (this.placeholderQuestion.options.length > 1)
-    {
+    if (this.placeholderQuestion.options.length > 1) {
       this.placeholderQuestion.options.splice(index, 1);
     }
   }
@@ -51,10 +56,24 @@ export class QuestionFormComponent implements OnInit, OnChanges {
   initializePlaceholderQuestion(): void {
     this.placeholderQuestion = {
       title: '',
-      optionType: OptionType.RADIO,
-      options: [{
-        details: ''
-      }]
+      optionType: OptionType.Multiple_Choice,
+      options: [],
     };
+  }
+  onSelectType(): void {
+    if (this.placeholderQuestion.optionType == OptionType.True_Or_False) {
+      const options: Option[] = [
+        {
+          details: 'True',
+        },
+        {
+          details: 'False',
+        },
+      ];
+      this.placeholderQuestion.options = options;
+    }
+    else{
+      this.placeholderQuestion.options = [];
+    }
   }
 }

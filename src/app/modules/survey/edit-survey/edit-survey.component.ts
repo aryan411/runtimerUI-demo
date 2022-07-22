@@ -15,29 +15,34 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 export class EditSurveyComponent implements OnInit, AfterViewInit{
   public selectedQuestion!: Question | null;
   private user!: User;
+  survey!:any
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private surveyRepository: SurveyService,
     private flashMessage: FlashMessagesService
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.user = JSON.parse(localStorage.getItem('user') as string);
-  }
-
-  ngAfterViewInit(): void {
+    const id = this.route.snapshot.params.id;
+    this.survey =  this.surveyRepository.getSurvey(id);
     // reroute user if not his own survey
-    if (this.user.id !== this.survey.user) {
+    if (this.user?.id !== this.survey?.user) {
       this.router.navigateByUrl('/error');
     }
   }
 
-  get survey(): Survey {
-    const id = this.route.snapshot.params.id;
-    return this.surveyRepository.getSurvey(id);
+  ngOnInit(): void {
+    
   }
+
+  ngAfterViewInit(): void {
+    
+  }
+
+  // get survey(): Survey {
+    
+  // }
 
   onQuestionEdit(question: Question): void {
     this.selectedQuestion = question;
@@ -88,17 +93,33 @@ export class EditSurveyComponent implements OnInit, AfterViewInit{
   }
 
   validateDates(): boolean {
-    const activeDate = new Date(this.survey.dateActive as string).getTime();
-    const expireDate = new Date(this.survey.dateExpire as string).getTime();
-    const currentDate = (new Date(Date.now())).getTime() - 60000; // adjust by one minute to allow user to select current time;
-
-    let errorMessage;
-
-    if (activeDate < currentDate) {
-      errorMessage = 'Error: Active date cannot be earlier than current date';
+    let activeDate , expireDate, currentDate;
+    currentDate = (new Date(Date.now())).getTime() - 60000; // adjust by one minute to allow user to select current time;
+    if(this.survey.dateActive && this.survey.dateActive != "")
+    {
+      activeDate = new Date(this.survey.dateActive as string).getTime();
     }
+    else
+    {
+      this.survey.dateActive = new Date().toISOString();
+      activeDate = new Date(this.survey.dateActive as string).getTime();
+      
+    }
+    if(this.survey.dateExpire && this.survey.dateExpire != "")
+    {
+      expireDate = new Date(this.survey.dateExpire as string).getTime();
+    }
+    else
+    {
+      this.survey.dateExpire = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+      expireDate = new Date(this.survey.dateExpire as string).getTime();
+    }
+    let errorMessage;
+    // if (activeDate < currentDate) {
+    //   errorMessage = 'Error: Active date cannot be earlier than current date';
+    // }
 
-    if (expireDate < activeDate) {
+    if (expireDate <= activeDate) {
       errorMessage = 'Error: Expiry date cannot be before date active.';
     }
 

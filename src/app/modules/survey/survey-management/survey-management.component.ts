@@ -37,11 +37,7 @@ export class SurveyManagementComponent implements OnInit, AfterViewInit {
     this.newSurvey.user = this.user.id;
     this.repository.addSurvey(this.newSurvey);
     this.initializeNewSurvey();
-    Swal.fire({
-      title: 'Survey Created',
-      text: 'Select your survey to add questions',
-      icon: 'success'
-    });
+    
   }
 
   onDeleteSurvey(survey: Survey): void {

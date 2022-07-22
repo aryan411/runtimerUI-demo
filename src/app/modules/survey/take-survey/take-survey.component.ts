@@ -2,6 +2,8 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { Router } from '@angular/router';
+import { FlashMessagesService } from 'angular2-flash-messages';
+import { OptionType } from 'src/app/core/models/option.model';
 import Question from 'src/app/core/models/question.model';
 import { Survey } from 'src/app/core/models/survey.model';
 import { SurveyService } from 'src/app/core/services/survey/survey.service';
@@ -22,13 +24,14 @@ export class TakeSurveyComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private surveyRepository: SurveyService,
     public router: Router,
+    private flashMessage: FlashMessagesService
   ) { }
 
   ngOnInit(): void {
+    
     if (this.survey && this.survey.questions) {
       this.survey.questions.forEach((question, i) => {
-        question.chosenOptions = ['test'];
-
+        // question.chosenOptions = null;
         // reset count to zero. update will be in backend
         if(this.survey.questions && this.survey.questions[i].options){
           this.survey.questions[i].options.forEach(option => {
@@ -47,6 +50,7 @@ export class TakeSurveyComponent implements OnInit, AfterViewInit {
 
   // reroute if survey is inactive
   ngAfterViewInit(): void {
+    
     if (this.survey && !this.surveyRepository.isActive(this.survey)){
 
       // removove elements from site
@@ -90,6 +94,7 @@ export class TakeSurveyComponent implements OnInit, AfterViewInit {
 
   onConfirmSubmit(event: Event): void {
     event.preventDefault();
+    if(this.AllAnswered())
     Swal.fire({
       title: 'Are you sure?',
       text: 'You will not be able change your answers.',
@@ -102,9 +107,12 @@ export class TakeSurveyComponent implements OnInit, AfterViewInit {
         this.surveySave();
       }
     });
+    else {
+      this.flashMessage.show('To Submit the Survey, please answer all the questions.', {cssClass: 'alert-danger', timeOut: 6000});
+    }
   }
 
-  surveySave(): void {
+  surveySave(): any {
 
     // checking the selected option and updating the options count
     if (this.survey && this.survey.questions)
@@ -112,17 +120,16 @@ export class TakeSurveyComponent implements OnInit, AfterViewInit {
     {
       const question = this.survey?.questions[index] as Question;
       const options = this.survey.questions[index].options;
-      const chosenOptions = this.survey.questions[index].chosenOptions as string[];
-
+      const chosenOptions = this.survey.questions[index].chosenOptions as string;
+      debugger
       for (let j = 0; j <= options.length - 1; j++)
       {
-        for (let m = 0; m <= chosenOptions.length - 1; m++)
-        {
-          if (question != undefined && question.chosenOptions && question.options != undefined && question.options[j].count != undefined && question.chosenOptions[m] === question.options[j]._id)
+        
+          if (question != undefined && question.chosenOptions && question.options != undefined && question.options[j].count != undefined &&  question.options.some(q => q.details == question.chosenOptions))
           {
              question.options[j].count  = question.options[j].count as number + 1; 
           }
-        }
+          
       }
 
       question.chosenOptions = undefined; // reset chosen option
@@ -156,20 +163,20 @@ export class TakeSurveyComponent implements OnInit, AfterViewInit {
   onSelectOption(question: Question, optionId: string): void {
 
     // initializing array
-    if (!question.chosenOptions) {
-      question.chosenOptions = [];
-    }
+    // if (!question.chosenOptions) {
+      
+    // }
 
-    if (question.optionType === 'radio')  {
-      question.chosenOptions[0] = optionId;
-    } else if (question.optionType === 'checkbox') {
-      if (!question.chosenOptions.includes(optionId)) // if first selection
-      {
-        question.chosenOptions.push(optionId); // add to chosen options
-      } else {
-        question.chosenOptions.splice(question.chosenOptions.indexOf(optionId), 1); // else remove
-      }
-    }
+    // if (question.optionType === OptionType.Multiple_Choice )  {
+      question.chosenOptions = optionId;
+    // } else if (question.optionType === OptionType.True_Or_False) {
+    //   if (!question.chosenOptions.includes(optionId)) // if first selection
+    //   {
+    //     question.chosenOptions.push(optionId); // add to chosen options
+    //   } else {
+    //     question.chosenOptions.splice(question.chosenOptions.indexOf(optionId), 1); // else remove
+    //   }
+    // }
   }
 
   checkIfSelected(question: Question, optionId: string | undefined): boolean {
@@ -178,5 +185,31 @@ export class TakeSurveyComponent implements OnInit, AfterViewInit {
       return condition;
     }
     return false;
+  }
+  AllAnswered():boolean{
+  
+    if (this.survey && this.survey.questions)
+    for (let index = 0; index <=  this.survey.questions.length - 1; index++)
+    {
+      const question = this.survey?.questions[index] as Question;
+      const options = this.survey.questions[index].options;
+      const chosenOptions = this.survey.questions[index].chosenOptions as string;
+      debugger
+   
+        
+          if (question != undefined && question.chosenOptions && question.options != undefined  &&  question.options.some(q => q._id == question.chosenOptions))
+          {
+             question.options.forEach(op => {
+              if(op._id == question.chosenOptions)
+              op.count ?  op.count += 1  : op.count = 1;
+            })
+          }
+          else {
+           return false;
+          }
+
+      // question.chosenOptions = undefined; // reset chosen option
+    }
+    return true;
   }
 }

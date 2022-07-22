@@ -5,6 +5,6 @@ export interface Option {
 }
 
 export enum OptionType {
-  CHECKBOX = 'checkbox',
-  RADIO = 'radio',
+  True_Or_False ="True or False",
+  Multiple_Choice = "Multiple Choice"
 }

@@ -5,5 +5,5 @@ export default interface Question {
   title: string;
   optionType: OptionType;
   options: Option[];
-  chosenOptions?: string[];
+  chosenOptions?: string;
 }

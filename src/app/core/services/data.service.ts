@@ -37,6 +37,7 @@ export class DataService {
 
     // * Deployment
     this.localBaseUrl = "http://localhost:3500/api/";
+    let localIPUrl = "http://192.168.12.13:3500/api/";
     this.prodUrl ="https://survayexpert.herokuapp.com/api/";
     this.baseUrl = this.prodUrl;
     
@@ -45,7 +46,11 @@ export class DataService {
 
   getSurveys(): Observable<IResponse>
   {
-    return this.http.get<IResponse>(this.baseUrl + 'survey');
+    return this.http.get<IResponse>(this.baseUrl + 'survey/');
+  }
+  getActiveSurveys(): Observable<IResponse>
+  {
+    return this.http.get<IResponse>(this.baseUrl + 'survey/active/');
   }
 
   getSurvey(id: string): Observable<IResponse>
